@@ -1,0 +1,9 @@
+.DS_Store
+ios/.build/
+ios/.swiftpm/
+ios/App/Weather.xcodeproj/
+android/.gradle/
+android/**/build/
+android/local.properties
+android/.kotlin/
+tests/node_modules/

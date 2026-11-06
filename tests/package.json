@@ -1,0 +1,14 @@
+{
+  "name": "reflex-native-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:ios": "PLATFORM=ios bun test",
+    "test:android": "PLATFORM=android bun test",
+    "test:rn": "PLATFORM=rn bun test --timeout 30000",
+    "test": "bun run test:ios && bun run test:android && bun run test:rn"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

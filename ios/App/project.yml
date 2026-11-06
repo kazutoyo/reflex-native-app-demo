@@ -1,0 +1,30 @@
+# Run `xcodegen generate` to create Weather.xcodeproj
+name: Weather
+options:
+  bundleIdPrefix: dev.kazutoyo
+  deploymentTarget:
+    iOS: "26.0"
+packages:
+  WeatherCore:
+    path: ..
+targets:
+  Weather:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    dependencies:
+      - package: WeatherCore
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: 天気
+        UILaunchScreen: {}
+        NSLocationWhenInUseUsageDescription: 現在地の天気を表示するために使います
+        NSLocalNetworkUsageDescription: 開発中に CLI からアプリを操作するために使います
+        CFBundleURLTypes:
+          - CFBundleURLSchemes: [reflexweather]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.kazutoyo.reflexweather
+        SWIFT_VERSION: "6.0"
+        CODE_SIGNING_ALLOWED: "NO"
