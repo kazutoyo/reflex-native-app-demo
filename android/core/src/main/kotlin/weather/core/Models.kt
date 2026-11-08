@@ -1,5 +1,6 @@
 package weather.core
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -20,7 +21,11 @@ data class Coords(val latitude: Double, val longitude: Double)
 /** Error shown to the user. message goes into state as is. */
 class CoreError(message: String) : Exception(message)
 
-internal fun errorMessage(e: Throwable) = e.message ?: e.toString()
+/** Rethrows cancellation so a cancelled load is not shown as an error. */
+internal fun errorMessage(e: Throwable): String {
+  if (e is CancellationException) throw e
+  return e.message ?: e.toString()
+}
 
 /** JSON for state and actions. Writes nulls too (to match the Swift version). */
 val CoreJson = Json {
