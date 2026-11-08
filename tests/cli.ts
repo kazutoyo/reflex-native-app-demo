@@ -4,7 +4,7 @@
 //   bun cli.ts [--platform ios|android | --connect host:port] [--launch '<json>'] <command>...
 //     ls                     State and actions of the current screen
 //     do <Action> [json]     Send an action          e.g. do Open '{"id":1850147}'
-//     env <json>             Change the device environment (headless only)
+//     env <json>             Change the device environment  e.g. env '{"http":"offline"}' / env '{"weatherCode":61}'
 //     open <route>           Deep link (app only)
 //
 //   bun cli.ts --platform android --launch '{"route":"/search"}' do ChangeQuery '{"query":"Tokyo"}' do Submit

@@ -17,9 +17,11 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    root = AppRoot(Deps(UrlConnectionHttp(), location, PreferencesFavorites(this)), lifecycleScope)
+    val debuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+    val http = if (debuggable) DebugHttp(UrlConnectionHttp()) else UrlConnectionHttp()
+    root = AppRoot(Deps(http, location, PreferencesFavorites(this)), lifecycleScope)
     root.open(intent.data?.let { "/" + (it.host ?: "") + (it.path ?: "") } ?: "/")
-    if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) InspectorServer(root, lifecycleScope).start()
+    if (http is DebugHttp) InspectorServer(root, http, lifecycleScope).start()
     setContent { RootView(root) }
   }
 

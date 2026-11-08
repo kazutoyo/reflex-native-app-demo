@@ -3,7 +3,32 @@
   @preconcurrency import Network
   import WeatherCore
 
-  /// Small server that runs only in development builds. Speaks the same NDJSON as the CLI (ls / do / open) over TCP and drives the same ViewModels.
+  /// Wraps the real HTTP client so `env` can switch the device environment, like the CLI does.
+  @MainActor final class DebugHTTP: HTTPClient {
+    static let shared = DebugHTTP()
+    private let base = URLSessionHTTP()
+    var offline = false
+    var weatherCode: Int?
+
+    func get(_ url: String) async throws -> HTTPResponse {
+      if offline { throw CoreError("ネットワークに接続できません") }
+      let res = try await base.get(url)
+      guard let code = weatherCode, URLComponents(string: url)?.path == "/v1/forecast",
+        var json = try? JSONSerialization.jsonObject(with: res.body) as? [String: Any],
+        var current = json["current"] as? [String: Any], var daily = json["daily"] as? [String: Any],
+        var codes = daily["weather_code"] as? [Int], !codes.isEmpty
+      else { return res }
+      // Override current weather and today's forecast (for rain, snow, and similar cases)
+      current["weather_code"] = code
+      codes[0] = code
+      daily["weather_code"] = codes
+      json["current"] = current
+      json["daily"] = daily
+      return HTTPResponse(status: res.status, body: try JSONSerialization.data(withJSONObject: json))
+    }
+  }
+
+  /// Small server that runs only in development builds. Speaks the same NDJSON as the CLI (ls / do / open / env) over TCP and drives the same ViewModels.
   /// The simulator shares the host's network, so the Mac connects via localhost:8765.
   @MainActor final class InspectorServer {
     static let shared = InspectorServer()
@@ -60,8 +85,16 @@
         case "open":
           root.open(req["route"] as? String ?? "/")
           await root.idle()
+        case "env":
+          switch req["http"] as? String {
+          case "offline": DebugHTTP.shared.offline = true
+          case "live": DebugHTTP.shared.offline = false
+          case nil: break
+          case let other?: throw CoreError("http は offline か live: \(other)")
+          }
+          if req.keys.contains("weatherCode") { DebugHTTP.shared.weatherCode = req["weatherCode"] as? Int }
         default:
-          throw CoreError("知らないコマンド: \(req["cmd"] ?? "")（アプリでは ls / do / open だけ）")
+          throw CoreError("知らないコマンド: \(req["cmd"] ?? "")（アプリでは ls / do / open / env だけ）")
         }
         return try JSONEncoder().encode(Response(snapshot: root.snapshot))
       } catch {

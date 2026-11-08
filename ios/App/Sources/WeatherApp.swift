@@ -3,8 +3,13 @@ import WeatherCore
 
 @main
 struct WeatherApp: App {
+  #if DEBUG
+    private static let http: HTTPClient = DebugHTTP.shared
+  #else
+    private static let http: HTTPClient = URLSessionHTTP()
+  #endif
   @State private var root = AppRoot(
-    deps: Deps(http: URLSessionHTTP(), location: DeviceLocation(), favorites: DefaultsFavorites()))
+    deps: Deps(http: http, location: DeviceLocation(), favorites: DefaultsFavorites()))
 
   var body: some Scene {
     WindowGroup {

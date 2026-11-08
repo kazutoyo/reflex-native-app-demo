@@ -76,7 +76,7 @@ state の JSON は Swift と Kotlin で同じ形にしています（`null` も�
 | `launch` | アプリを作り直す。`route`（ディープリンク）、`favorites`、端末の環境を渡す | ○ | |
 | `ls` | 今の画面の name / state / actions | ○ | ○ |
 | `do` | アクションを送る。副作用が終わってから返す。今の画面にも親にもないアクションと、入力の型が違うアクションは断る | ○ | ○ |
-| `env` | 端末の環境を変える（位置情報の許可、通信、天気コード） | ○ | |
+| `env` | 端末の環境を変える（位置情報の許可、通信、天気コード）。アプリで使えるのは `http`（`offline` / `live`）と `weatherCode` だけ | ○ | ○ |
 | `open` | ディープリンク | | ○ |
 
 `env` はテスト用です。設定アプリの呼び出し回数、保存したお気に入り、HTTP の回数、ネットワークに出ようとした回数を返します。CLI はプロセスの外への HTTP をすべて止めていて（iOS は `URLProtocol`、JVM は `ProxySelector`）、1 回でも試みたらテストを落とします。
@@ -115,6 +115,7 @@ $ do Open {"id":1850147}
 
 ```bash
 bun cli.ts --connect localhost:8765 do SelectTab '{"tab":"search"}' do ChangeQuery '{"query":"Tokyo"}' do Submit do Open '{"id":1850147}'
+bun cli.ts --connect localhost:8765 env '{"weatherCode":71}' do Retry   # 本物の API の応答のまま、天気だけ雪にする
 ```
 
 - iOS シミュレータ：ホストとネットワークを共有するので、そのまま `localhost:8765`
@@ -175,5 +176,5 @@ CLI で 7 操作（検索 → 詳細 → お気に入り → 戻る → お気�
 
 - 入力のスキーマは手で書いた型の decode です（Swift は `Decodable`、Kotlin は `@Serializable`）。Reflex のようなマクロでの生成はしていません。
 - Kotlin の Core は、JSON と非同期のために `kotlinx.serialization` と `kotlinx.coroutines` を使っています。Reflex 自体（ViewModel の基底クラスと Introspection のプロトコル）は第三者の依存を持たないそうです。
-- アプリ内のサーバーには `launch` と `env` がありません。シミュレータでシナリオ（雨、オフラインなど）を切り替えるのは未実装です。
+- アプリ内のサーバーには `launch` がなく、`env` は `http` と `weatherCode` だけです。位置情報の許可はアプリでは切り替えられません。
 - Android の実機と、iOS の実機では確認していません。
