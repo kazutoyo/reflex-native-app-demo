@@ -49,7 +49,7 @@ test('API が 500 ならエラー、直れば再試行で読める', async () =>
 test('設定で許可してから天気タブに戻ると、読み直す', async () => {
   const app = await launch({ location: { granted: false, canAskAgain: false } });
   await app.do('OpenSettings');
-  await app.do('OpenSearch');
+  await app.do('OpenSearch'); // Leave the weather tab so that coming back sends Appear
 
   await app.env({ location: { granted: true } }); // Granted in the Settings app
   expect(await app.do('SelectTab', { tab: 'weather' })).toMatchObject({
