@@ -1,6 +1,8 @@
 package weather.app
 
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +51,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import weather.core.AppRoot
 import weather.core.CityAction
@@ -79,10 +81,10 @@ import weather.core.describeWeather
 
 // Screens are presentation only. All logic lives in the core ViewModels. The View's only contract: read state and call send.
 
-/** Sends from a button. */
+/** Sends from a button. Uses the Activity scope: a composition scope would cancel a load when the user switches tabs. */
 @Composable
 private fun <A> sender(send: suspend (A) -> Unit): (A) -> Unit {
-  val scope = rememberCoroutineScope()
+  val scope = (LocalActivity.current as ComponentActivity).lifecycleScope
   return { action -> scope.launch { send(action) } }
 }
 
