@@ -47,4 +47,5 @@ test('知らないアクションは送れず、送れるアクションを返�
 test('入力の形が違うアクションは、画面に届く前に断る', async () => {
   const app = await launch({ route: '/search' });
   await expect(app.do('Open', { id: 'tokyo' })).rejects.toThrow('Open の入力が正しくない');
+  await expect(app.do('Open', { id: '1850147' })).rejects.toThrow('Open の入力が正しくない');
 });
