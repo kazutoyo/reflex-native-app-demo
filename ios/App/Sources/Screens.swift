@@ -32,6 +32,8 @@ struct WeatherScreen: View {
       }
     }
     .navigationTitle(loaded?.place ?? String(localized: "My Location"))
+    // A large title ignores toolbarColorScheme and stays black on the sky gradient
+    .navigationBarTitleDisplayMode(.inline)
   }
 }
 
