@@ -7,6 +7,7 @@ Shopify の [Reflex](https://shopify.engineering/reflex) を、ネイティブ�
 - 現在地の天気、都市検索、お気に入りの3タブ。API は [Open-Meteo](https://open-meteo.com/)（API キー不要）
 - iOS：SwiftUI（iOS 26 の Liquid Glass）、CoreLocation、UserDefaults
 - Android：Jetpack Compose（Material 3）、LocationManager、SharedPreferences
+- 画面は英語と日本語に対応しています。端末の言語に合わせて切り替わります（iOS は `ja.lproj`、Android は `values-ja`）
 
 ![iOS と Android のアプリ](docs/apps.png)
 

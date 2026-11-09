@@ -71,13 +71,13 @@ struct Response: Encodable {
     case "ls":
       break
     case "do":
-      guard let action = req["action"] as? String else { throw CoreError("action がない") }
+      guard let action = req["action"] as? String else { throw CoreError("Missing action") }
       let input = try JSONSerialization.data(withJSONObject: req["input"] ?? [String: Any]())
       try await app().perform(action, input: input)
     case "env":
       apply(req)
     default:
-      throw CoreError("知らないコマンド: \(req["cmd"] ?? "")")
+      throw CoreError("Unknown command: \(req["cmd"] ?? "")")
     }
     let root = try app()
     return Response(
@@ -87,7 +87,7 @@ struct Response: Encodable {
   }
 
   func app() throws -> AppRoot {
-    guard let root else { throw CoreError("先に launch する") }
+    guard let root else { throw CoreError("Run launch first") }
     return root
   }
 }
@@ -100,7 +100,7 @@ while let line = readLine() {
   let out: Data
   do {
     guard let req = try JSONSerialization.jsonObject(with: Data(line.utf8)) as? [String: Any] else {
-      throw CoreError("JSON のオブジェクトではない")
+      throw CoreError("Not a JSON object")
     }
     out = try encoder.encode(try await session.handle(req))
   } catch {

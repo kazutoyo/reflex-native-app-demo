@@ -32,7 +32,7 @@ extension ViewModel {
     do {
       decoded = try JSONDecoder().decode(Action.self, from: wrapped)
     } catch {
-      throw CoreError("\(action) の入力が正しくない: \(String(data: input, encoding: .utf8) ?? "")")
+      throw CoreError("Invalid input for \(action): \(String(data: input, encoding: .utf8) ?? "")")
     }
     await send(decoded)
   }

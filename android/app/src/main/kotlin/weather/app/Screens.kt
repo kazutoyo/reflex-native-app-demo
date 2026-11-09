@@ -73,11 +73,13 @@ import weather.core.Forecast
 import weather.core.SearchAction
 import weather.core.SearchState
 import weather.core.SearchViewModel
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import dev.kazutoyo.reflexweather.R
 import weather.core.Tab
 import weather.core.WeatherAction
 import weather.core.WeatherState
 import weather.core.WeatherViewModel
-import weather.core.describeWeather
 
 // Screens are presentation only. All logic lives in the core ViewModels. The View's only contract: read state and call send.
 
@@ -99,12 +101,12 @@ fun RootView(root: AppRoot) {
     Scaffold(
       bottomBar = {
         NavigationBar {
-          listOf(Tab.Weather to "天気", Tab.Search to "検索", Tab.Favorites to "お気に入り").forEach { (t, label) ->
+          listOf(Tab.Weather to R.string.tab_weather, Tab.Search to R.string.tab_search, Tab.Favorites to R.string.tab_favorites).forEach { (t, label) ->
             NavigationBarItem(
               selected = tab == t,
               onClick = { root.selectTab(t) },
               icon = { Icon(when (t) { Tab.Weather -> Icons.Default.Cloud; Tab.Search -> Icons.Default.Search; Tab.Favorites -> Icons.Default.Star }, null) },
-              label = { Text(label) },
+              label = { Text(stringResource(label)) },
             )
           }
         }
@@ -137,7 +139,7 @@ private fun Sky(code: Int?, title: String, onBack: (() -> Unit)? = null, actions
     Column(Modifier.fillMaxSize().background(Brush.verticalGradient(skyColors(code)))) {
       TopAppBar(
         title = { Text(title, fontWeight = FontWeight.Bold) },
-        navigationIcon = { if (onBack != null) IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "戻る") } },
+        navigationIcon = { if (onBack != null) IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back)) } },
         actions = { actions() },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
       )
@@ -153,16 +155,16 @@ private fun Sky(code: Int?, title: String, onBack: (() -> Unit)? = null, actions
 @Composable
 private fun ForecastCard(forecast: Forecast) {
   Text("${Math.round(forecast.current.temperature)}°", fontSize = 88.sp, fontWeight = FontWeight.Thin, color = Color.White)
-  Text(describeWeather(forecast.current.code), style = MaterialTheme.typography.titleLarge, color = Color.White)
+  Text(stringResource(describeWeather(forecast.current.code)), style = MaterialTheme.typography.titleLarge, color = Color.White)
   forecast.daily.firstOrNull()?.let {
-    Text("最高 ${Math.round(it.max)}° 最低 ${Math.round(it.min)}°", color = Color.White)
+    Text(stringResource(R.string.high_low, Math.round(it.max), Math.round(it.min)), color = Color.White)
   }
   Column(Modifier.fillMaxWidth().background(Color.Black.copy(alpha = 0.18f), RoundedCornerShape(24.dp)).padding(16.dp)) {
-    Text("7日間の予報", style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.7f))
+    Text(stringResource(R.string.forecast_7_day), style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.7f))
     forecast.daily.forEachIndexed { i, day ->
       Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(if (i == 0) "今日" else day.date.drop(5).replace("-", "/"), Modifier.width(56.dp), color = Color.White)
-        Text(describeWeather(day.code), Modifier.weight(1f), color = Color.White.copy(alpha = 0.7f))
+        Text(if (i == 0) stringResource(R.string.today) else day.date.drop(5).replace("-", "/"), Modifier.width(56.dp), color = Color.White)
+        Text(stringResource(describeWeather(day.code)), Modifier.weight(1f), color = Color.White.copy(alpha = 0.7f))
         Text("${Math.round(day.min)}°", color = Color.White.copy(alpha = 0.7f))
         Text("${Math.round(day.max)}°", Modifier.width(44.dp), color = Color.White, textAlign = androidx.compose.ui.text.style.TextAlign.End)
       }
@@ -188,17 +190,17 @@ fun WeatherScreen(vm: WeatherViewModel) {
   val state by vm.state.collectAsState()
   val send = sender(vm::send)
   val loaded = state as? WeatherState.Loaded
-  Sky(loaded?.forecast?.current?.code, loaded?.place ?: "現在地") {
+  Sky(loaded?.forecast?.current?.code, loaded?.place ?: stringResource(R.string.my_location)) {
     when (val s = state) {
       WeatherState.Idle, WeatherState.Loading -> CircularProgressIndicator(Modifier.padding(top = 120.dp), color = Color.White)
       is WeatherState.Loaded -> ForecastCard(s.forecast)
-      is WeatherState.PermissionDenied -> MessageCard("位置情報が許可されていません", "現在地の天気を表示するには、位置情報の利用を許可してください。") {
-        if (s.canAskAgain) Button({ send(WeatherAction.Retry) }) { Text("もう一度許可する") }
-        else Button({ send(WeatherAction.OpenSettings) }) { Text("設定を開く") }
-        OutlinedButton({ send(WeatherAction.OpenSearch) }) { Text("都市を検索する") }
+      is WeatherState.PermissionDenied -> MessageCard(stringResource(R.string.location_off_title), stringResource(R.string.location_off_message)) {
+        if (s.canAskAgain) Button({ send(WeatherAction.Retry) }) { Text(stringResource(R.string.allow_again)) }
+        else Button({ send(WeatherAction.OpenSettings) }) { Text(stringResource(R.string.open_settings)) }
+        OutlinedButton({ send(WeatherAction.OpenSearch) }) { Text(stringResource(R.string.search_for_city)) }
       }
-      is WeatherState.Error -> MessageCard("天気を取得できませんでした", s.message) {
-        Button({ send(WeatherAction.Retry) }) { Text("再試行") }
+      is WeatherState.Error -> MessageCard(stringResource(R.string.weather_failed), s.message) {
+        Button({ send(WeatherAction.Retry) }) { Text(stringResource(R.string.try_again)) }
       }
     }
   }
@@ -213,11 +215,11 @@ fun SearchScreen(vm: SearchViewModel) {
   var query by remember { mutableStateOf(state.query) }
   val searched = state.status != SearchState.Status.idle && state.query.isNotBlank()
   Column(Modifier.fillMaxSize()) {
-    TopAppBar(title = { Text("検索", fontWeight = FontWeight.Bold) })
+    TopAppBar(title = { Text(stringResource(R.string.tab_search), fontWeight = FontWeight.Bold) })
     OutlinedTextField(
       value = query,
       onValueChange = { query = it; send(SearchAction.ChangeQuery(it)) },
-      placeholder = { Text("都市名（例：Tokyo）") },
+      placeholder = { Text(stringResource(R.string.search_placeholder)) },
       singleLine = true,
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
       keyboardActions = KeyboardActions(onSearch = { send(SearchAction.Submit) }),
@@ -225,9 +227,9 @@ fun SearchScreen(vm: SearchViewModel) {
     )
     when {
       state.status == SearchState.Status.loading -> CircularProgressIndicator(Modifier.padding(24.dp).align(Alignment.CenterHorizontally))
-      state.status == SearchState.Status.error -> Text("検索できませんでした：${state.error}", Modifier.padding(24.dp))
-      searched && state.results.isEmpty() -> Text("見つかりませんでした", Modifier.padding(24.dp))
-      !searched -> Text("都市名で検索して、天気を見られます", Modifier.padding(24.dp), color = Color.Gray)
+      state.status == SearchState.Status.error -> Text(stringResource(R.string.search_failed, state.error ?: ""), Modifier.padding(24.dp))
+      searched && state.results.isEmpty() -> Text(stringResource(R.string.no_results), Modifier.padding(24.dp))
+      !searched -> Text(stringResource(R.string.search_hint), Modifier.padding(24.dp), color = Color.Gray)
     }
     LazyColumn {
       items(if (searched) state.results else emptyList(), key = { it.id }) { city ->
@@ -249,7 +251,7 @@ fun CityScreen(vm: CityViewModel, onBack: () -> Unit) {
   val loaded = state as? CityState.Loaded
   Sky(loaded?.forecast?.current?.code, loaded?.city?.name ?: "", onBack, actions = {
     if (loaded != null) IconButton({ send(CityAction.ToggleFavorite) }) {
-      Icon(if (loaded.favorite) Icons.Default.Star else Icons.Default.StarBorder, "お気に入り",
+      Icon(if (loaded.favorite) Icons.Default.Star else Icons.Default.StarBorder, stringResource(R.string.favorite),
         tint = if (loaded.favorite) Color(0xFFFFC107) else Color.White)
     }
   }) {
@@ -259,8 +261,8 @@ fun CityScreen(vm: CityViewModel, onBack: () -> Unit) {
         Text(s.city.region, color = Color.White.copy(alpha = 0.75f))
         ForecastCard(s.forecast)
       }
-      is CityState.Error -> MessageCard("天気を取得できませんでした", s.message) {
-        Button({ send(CityAction.Retry) }) { Text("再試行") }
+      is CityState.Error -> MessageCard(stringResource(R.string.weather_failed), s.message) {
+        Button({ send(CityAction.Retry) }) { Text(stringResource(R.string.try_again)) }
       }
     }
   }
@@ -272,9 +274,9 @@ fun FavoritesScreen(vm: FavoritesViewModel) {
   val state by vm.state.collectAsState()
   val send = sender(vm::send)
   Column(Modifier.fillMaxSize()) {
-    TopAppBar(title = { Text("お気に入り", fontWeight = FontWeight.Bold) })
+    TopAppBar(title = { Text(stringResource(R.string.tab_favorites), fontWeight = FontWeight.Bold) })
     if (state.status == FavoritesState.Status.loaded && state.items.isEmpty()) {
-      Text("お気に入りはまだありません。都市の詳細で ☆ を押すと、ここに並びます", Modifier.padding(24.dp), color = Color.Gray)
+      Text(stringResource(R.string.no_favorites), Modifier.padding(24.dp), color = Color.Gray)
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
       items(state.items, key = { it.city.id }) { item ->
@@ -287,7 +289,7 @@ fun FavoritesScreen(vm: FavoritesViewModel) {
             Text(item.city.name, color = Color.White, style = MaterialTheme.typography.titleLarge)
             Text(item.city.region, color = Color.White, style = MaterialTheme.typography.bodySmall)
             Spacer(Modifier.weight(1f))
-            Text(item.current?.let { describeWeather(it.code) } ?: if (item.failed) "取得できませんでした" else "", color = Color.White)
+            Text(item.current?.let { stringResource(describeWeather(it.code)) } ?: if (item.failed) stringResource(R.string.couldnt_load) else "", color = Color.White)
           }
           when {
             item.current != null -> Text("${Math.round(item.current!!.temperature)}°", color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Light)
@@ -297,4 +299,19 @@ fun FavoritesScreen(vm: FavoritesViewModel) {
       }
     }
   }
+}
+
+/** WMO weather code -> label. */
+@StringRes
+private fun describeWeather(code: Int): Int = when {
+  code == 0 -> R.string.weather_clear
+  code <= 2 -> R.string.weather_sunny
+  code == 3 -> R.string.weather_cloudy
+  code <= 48 -> R.string.weather_fog
+  code <= 57 -> R.string.weather_drizzle
+  code <= 67 -> R.string.weather_rain
+  code <= 77 -> R.string.weather_snow
+  code <= 82 -> R.string.weather_showers
+  code <= 86 -> R.string.weather_snow_showers
+  else -> R.string.weather_thunderstorm
 }

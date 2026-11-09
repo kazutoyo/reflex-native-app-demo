@@ -12,6 +12,22 @@ func skyColors(_ code: Int?) -> [Color] {
   }
 }
 
+/// WMO weather code -> label.
+func describeWeather(_ code: Int) -> LocalizedStringKey {
+  switch code {
+  case 0: "Clear"
+  case 1...2: "Sunny"
+  case 3: "Cloudy"
+  case ...48: "Fog"
+  case ...57: "Drizzle"
+  case ...67: "Rain"
+  case ...77: "Snow"
+  case ...82: "Showers"
+  case ...86: "Snow Showers"
+  default: "Thunderstorm"
+  }
+}
+
 func symbol(_ code: Int) -> String {
   switch code {
   case 0: "sun.max.fill"
@@ -47,16 +63,16 @@ struct ForecastCard: View {
       Text("\(Int(forecast.current.temperature.rounded()))°").font(.system(size: 88, weight: .thin))
       Text(describeWeather(forecast.current.code)).font(.title3.weight(.semibold))
       if let today = forecast.daily.first {
-        Text("最高 \(Int(today.max.rounded()))° 最低 \(Int(today.min.rounded()))°").font(.subheadline)
+        Text("H:\(Int(today.max.rounded()))° L:\(Int(today.min.rounded()))°").font(.subheadline)
       }
     }
     .foregroundStyle(.white)
 
     VStack(alignment: .leading, spacing: 0) {
-      Text("7日間の予報").font(.caption.weight(.semibold)).foregroundStyle(.secondary).padding(.bottom, 8)
+      Text("7-Day Forecast").font(.caption.weight(.semibold)).foregroundStyle(.secondary).padding(.bottom, 8)
       ForEach(Array(forecast.daily.enumerated()), id: \.offset) { i, day in
         HStack {
-          Text(i == 0 ? "今日" : String(day.date.dropFirst(5)).replacingOccurrences(of: "-", with: "/"))
+          Group { if i == 0 { Text("Today") } else { Text(verbatim: String(day.date.dropFirst(5)).replacingOccurrences(of: "-", with: "/")) } }
             .frame(width: 52, alignment: .leading)
           Image(systemName: symbol(day.code)).symbolRenderingMode(.multicolor).frame(width: 28)
           Text(describeWeather(day.code)).font(.footnote).foregroundStyle(.secondary)
@@ -74,7 +90,7 @@ struct ForecastCard: View {
 
 struct MessageCard<Actions: View>: View {
   let icon: String
-  let title: String
+  let title: LocalizedStringKey
   let message: String
   @ViewBuilder let actions: Actions
 
@@ -120,7 +136,7 @@ struct FavoriteCard: View {
         Text(item.city.name).font(.title3.weight(.semibold))
         Text(item.city.region).font(.caption)
         Spacer()
-        Text(item.current.map { describeWeather($0.code) } ?? (item.failed ? "取得できませんでした" : "")).font(.footnote)
+        Text(item.current.map { describeWeather($0.code) } ?? (item.failed ? "Couldn't load" : "")).font(.footnote)
       }
       Spacer()
       VStack(alignment: .trailing) {

@@ -11,7 +11,7 @@
     var weatherCode: Int?
 
     func get(_ url: String) async throws -> HTTPResponse {
-      if offline { throw CoreError("ネットワークに接続できません") }
+      if offline { throw CoreError("Cannot connect to the network") }
       let res = try await base.get(url)
       guard let code = weatherCode, URLComponents(string: url)?.path == "/v1/forecast",
         var json = try? JSONSerialization.jsonObject(with: res.body) as? [String: Any],
@@ -75,12 +75,12 @@
     private func handle(_ line: Data, root: AppRoot) async -> Data {
       do {
         guard let req = try JSONSerialization.jsonObject(with: line) as? [String: Any] else {
-          throw CoreError("JSON のオブジェクトではない")
+          throw CoreError("Not a JSON object")
         }
         switch req["cmd"] as? String {
         case "ls": break
         case "do":
-          guard let action = req["action"] as? String else { throw CoreError("action がない") }
+          guard let action = req["action"] as? String else { throw CoreError("Missing action") }
           try await root.perform(action, input: JSONSerialization.data(withJSONObject: req["input"] ?? [String: Any]()))
         case "open":
           root.open(req["route"] as? String ?? "/")
@@ -90,11 +90,11 @@
           case "offline": DebugHTTP.shared.offline = true
           case "live": DebugHTTP.shared.offline = false
           case nil: break
-          case let other?: throw CoreError("http は offline か live: \(other)")
+          case let other?: throw CoreError("http must be offline or live: \(other)")
           }
           if req.keys.contains("weatherCode") { DebugHTTP.shared.weatherCode = req["weatherCode"] as? Int }
         default:
-          throw CoreError("知らないコマンド: \(req["cmd"] ?? "")（アプリでは ls / do / open / env だけ）")
+          throw CoreError("Unknown command: \(req["cmd"] ?? ""). The app supports only ls, do, open, and env")
         }
         return try JSONEncoder().encode(Response(snapshot: root.snapshot))
       } catch {

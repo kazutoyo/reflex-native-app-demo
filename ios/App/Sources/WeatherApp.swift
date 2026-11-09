@@ -39,10 +39,10 @@ struct RootView: View {
 
   var body: some View {
     TabView(selection: Binding(get: { root.tab }, set: { root.selectTab($0) })) {
-      Tab("天気", systemImage: "cloud.sun.fill", value: AppTab.weather) {
+      Tab("Weather", systemImage: "cloud.sun.fill", value: AppTab.weather) {
         NavigationStack { WeatherScreen(vm: root.weather) }
       }
-      Tab("お気に入り", systemImage: "star.fill", value: AppTab.favorites) {
+      Tab("Favorites", systemImage: "star.fill", value: AppTab.favorites) {
         NavigationStack(path: path(.favorites)) {
           FavoritesScreen(vm: root.favorites)
             .navigationDestination(for: CityViewModel.self) { CityScreen(vm: $0) }

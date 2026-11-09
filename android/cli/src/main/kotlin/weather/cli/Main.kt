@@ -63,11 +63,11 @@ class Session(private val scope: CoroutineScope) {
       }
       "ls" -> {}
       "do" -> {
-        val action = req["action"]?.jsonPrimitive?.contentOrNull ?: throw CoreError("action がない")
+        val action = req["action"]?.jsonPrimitive?.contentOrNull ?: throw CoreError("Missing action")
         app().perform(action, req["input"]?.jsonObject ?: JsonObject(emptyMap()))
       }
       "env" -> apply(req)
-      else -> throw CoreError("知らないコマンド: ${req["cmd"]}")
+      else -> throw CoreError("Unknown command: ${req["cmd"]}")
     }
     val root = app()
     // Same snapshot as the in-app server, plus a test-only env (what is observable from outside the app)
@@ -83,7 +83,7 @@ class Session(private val scope: CoroutineScope) {
     }
   }
 
-  private fun app() = root ?: throw CoreError("先に launch する")
+  private fun app() = root ?: throw CoreError("Run launch first")
 }
 
 fun main(): Unit = runBlocking {

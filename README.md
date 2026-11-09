@@ -7,7 +7,7 @@ An experiment in applying Shopify's [Reflex](https://shopify.engineering/reflex)
 - Three tabs: weather at the current location, city search, and favorites. API: [Open-Meteo](https://open-meteo.com/) (no API key)
 - iOS: SwiftUI (iOS 26 Liquid Glass), CoreLocation, UserDefaults
 - Android: Jetpack Compose (Material 3), LocationManager, SharedPreferences
-- The UI text is in Japanese.
+- The UI is in English and Japanese. It follows the device language (iOS: `ja.lproj`, Android: `values-ja`).
 
 ![The iOS and Android apps](docs/apps.png)
 

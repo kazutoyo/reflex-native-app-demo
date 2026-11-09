@@ -33,17 +33,3 @@ val CoreJson = Json {
   encodeDefaults = true
   ignoreUnknownKeys = true
 }
-
-/** WMO weather code -> display values. */
-fun describeWeather(code: Int): String = when {
-  code == 0 -> "快晴"
-  code <= 2 -> "晴れ"
-  code == 3 -> "くもり"
-  code <= 48 -> "霧"
-  code <= 57 -> "霧雨"
-  code <= 67 -> "雨"
-  code <= 77 -> "雪"
-  code <= 82 -> "にわか雨"
-  code <= 86 -> "にわか雪"
-  else -> "雷雨"
-}

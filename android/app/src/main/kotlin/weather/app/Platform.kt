@@ -39,7 +39,7 @@ class UrlConnectionHttp : HttpClient {
       val status = conn.responseCode
       HttpResponse(status, (if (status < 400) conn.inputStream else conn.errorStream)?.bufferedReader()?.readText() ?: "")
     } catch (e: java.io.IOException) {
-      throw CoreError("ネットワークに接続できません")
+      throw CoreError("Cannot connect to the network")
     }
   }
 }
@@ -74,7 +74,7 @@ class DeviceLocation(private val activity: ComponentActivity) : LocationService 
           cont.resume(location?.let { Coords(it.latitude, it.longitude) })
         }
       }
-    } ?: throw CoreError("位置を取得できない")
+    } ?: throw CoreError("Cannot get the location")
   }
 
   override suspend fun placeName(coords: Coords): String? = suspendCancellableCoroutine { cont ->
@@ -83,7 +83,7 @@ class DeviceLocation(private val activity: ComponentActivity) : LocationService 
         val a = addresses.firstOrNull()
         cont.resume(a?.locality ?: a?.subAdminArea ?: a?.adminArea)
       }
-      override fun onError(errorMessage: String?) = cont.resumeWith(Result.failure(CoreError(errorMessage ?: "逆ジオコーディング失敗")))
+      override fun onError(errorMessage: String?) = cont.resumeWith(Result.failure(CoreError(errorMessage ?: "Reverse geocoding failed")))
     })
   }
 

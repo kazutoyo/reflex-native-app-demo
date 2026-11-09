@@ -4,7 +4,7 @@
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-  <application android:label="天気" android:theme="@android:style/Theme.Material.NoActionBar">
+  <application android:label="@string/app_name" android:theme="@android:style/Theme.Material.NoActionBar">
     <!-- Do not recreate the Activity on rotation and similar changes (the Activity owns AppRoot) -->
     <activity
       android:name="weather.app.MainActivity"

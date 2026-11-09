@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 
 import { launch, TOKYO } from './sdk';
 
-test('検索すると候補が出る', async () => {
+test('searching shows matching cities', async () => {
   const app = await launch({ route: '/search' });
   await app.do('ChangeQuery', { query: 'Tokyo' });
   const { state } = await app.do('Submit');
@@ -10,19 +10,19 @@ test('検索すると候補が出る', async () => {
   expect(state.results[0]).toEqual(TOKYO);
 });
 
-test('0 件でもエラーにならない', async () => {
+test('zero results is not an error', async () => {
   const app = await launch({ route: '/search' });
   await app.do('ChangeQuery', { query: 'zzzzqqq' });
   expect((await app.do('Submit')).state).toMatchObject({ status: 'loaded', results: [] });
 });
 
-test('空のクエリでは検索しない', async () => {
+test('an empty query does not search', async () => {
   const app = await launch({ route: '/search' });
   await app.do('ChangeQuery', { query: '  ' });
   expect((await app.do('Submit')).state.status).toBe('idle');
 });
 
-test('詳細でお気に入りにして戻ると、検索画面に反映される', async () => {
+test('favoriting on the detail screen shows up after going back to search', async () => {
   const app = await launch({ route: '/search' });
   expect((await app.ls()).state.favorites).toEqual([]);
 
@@ -42,9 +42,9 @@ test('詳細でお気に入りにして戻ると、検索画面に反映され�
   expect((await app.do('Open', { id: TOKYO.id })).state).toMatchObject({ status: 'loaded', favorite: true });
 });
 
-test('知らない都市はフィクスチャがないのでエラー（ネットワークには出ない）', async () => {
+test('an unknown city has no fixture, so it errors (without reaching the network)', async () => {
   const app = await launch({ route: '/cities/999' });
   const { state } = await app.ls();
   expect(state.status).toBe('error');
-  expect(state.message).toContain('フィクスチャがない');
+  expect(state.message).toContain('No fixture for');
 });

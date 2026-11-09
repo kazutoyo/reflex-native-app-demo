@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>天気</string>
+	<string>Weather</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -30,9 +30,9 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>開発中に CLI からアプリを操作するために使います</string>
+	<string>Used during development so the CLI can drive the app.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>現在地の天気を表示するために使います</string>
+	<string>Used to show the weather where you are.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>

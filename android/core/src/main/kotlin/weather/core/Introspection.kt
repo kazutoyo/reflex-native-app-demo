@@ -47,7 +47,7 @@ abstract class ViewModel<S, A, M>(
       require(!hasQuotedNonString(action, input))
       CoreJson.decodeFromJsonElement(actionSerializer, JsonObject(input + ("type" to JsonPrimitive(action))))
     } catch (e: Exception) {
-      throw CoreError("$action の入力が正しくない: $input")
+      throw CoreError("Invalid input for $action: $input")
     }
     send(decoded)
   }

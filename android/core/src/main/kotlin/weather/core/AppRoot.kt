@@ -127,12 +127,12 @@ class AppRoot(private val deps: Deps, private val scope: CoroutineScope) : Navig
         val decoded = try {
           CoreJson.decodeFromJsonElement(SelectTabInput.serializer(), input)
         } catch (e: Exception) {
-          throw CoreError("SelectTab の入力が正しくない: $input")
+          throw CoreError("Invalid input for SelectTab: $input")
         }
         selectTab(decoded.tab)
       }
       action in focused.actions -> focused.perform(action, input)
-      else -> throw CoreError("${focused.name} に $action はない: ${actions.joinToString(", ")}")
+      else -> throw CoreError("${focused.name} has no action $action. Actions: ${actions.joinToString(", ")}")
     }
     idle()
   }

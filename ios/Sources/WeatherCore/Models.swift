@@ -52,19 +52,3 @@ struct Key: CodingKey, ExpressibleByStringLiteral {
   var intValue: Int? { nil }
   init?(intValue: Int) { nil }
 }
-
-/// WMO weather code -> display values.
-public func describeWeather(_ code: Int) -> String {
-  switch code {
-  case 0: "快晴"
-  case 1...2: "晴れ"
-  case 3: "くもり"
-  case ...48: "霧"
-  case ...57: "霧雨"
-  case ...67: "雨"
-  case ...77: "雪"
-  case ...82: "にわか雨"
-  case ...86: "にわか雪"
-  default: "雷雨"
-  }
-}

@@ -13,25 +13,25 @@ struct WeatherScreen: View {
       case .idle, .loading:
         ProgressView().tint(.white).controlSize(.large).padding(.top, 120)
       case .loaded(let forecast, let place):
-        if place != nil { Text("現在地").font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.75)) }
+        if place != nil { Text("My Location").font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.75)) }
         ForecastCard(forecast: forecast)
       case .permissionDenied(let canAskAgain):
-        MessageCard(icon: "location.slash.fill", title: "位置情報が許可されていません",
-                    message: "現在地の天気を表示するには、位置情報の利用を許可してください。") {
+        MessageCard(icon: "location.slash.fill", title: "Location Access Is Off",
+                    message: String(localized: "Allow location access to see the weather where you are.")) {
           if canAskAgain {
-            Button("もう一度許可する") { vm.tap(.retry) }.buttonStyle(.glassProminent)
+            Button("Allow Again") { vm.tap(.retry) }.buttonStyle(.glassProminent)
           } else {
-            Button("設定を開く") { vm.tap(.openSettings) }.buttonStyle(.glassProminent)
+            Button("Open Settings") { vm.tap(.openSettings) }.buttonStyle(.glassProminent)
           }
-          Button("都市を検索する") { vm.tap(.openSearch) }.buttonStyle(.glass)
+          Button("Search for a City") { vm.tap(.openSearch) }.buttonStyle(.glass)
         }
       case .error(let message):
-        MessageCard(icon: "exclamationmark.icloud.fill", title: "天気を取得できませんでした", message: message) {
-          Button("再試行") { vm.tap(.retry) }.buttonStyle(.glassProminent)
+        MessageCard(icon: "exclamationmark.icloud.fill", title: "Couldn't Load the Weather", message: message) {
+          Button("Try Again") { vm.tap(.retry) }.buttonStyle(.glassProminent)
         }
       }
     }
-    .navigationTitle(loaded?.place ?? "現在地")
+    .navigationTitle(loaded?.place ?? String(localized: "My Location"))
   }
 }
 
@@ -50,21 +50,21 @@ struct SearchScreen: View {
             CityRow(city: city, favorite: s.favorites.contains { $0.id == city.id }) { vm.tap(.open(id: city.id)) }
           }
         } header: {
-          HStack { Text("検索結果"); if s.status == .loading { ProgressView() } }
+          HStack { Text("Results"); if s.status == .loading { ProgressView() } }
         }
       }
     }
     .overlay {
       if s.status == .error {
-        ContentUnavailableView("検索できませんでした", systemImage: "wifi.exclamationmark", description: Text(s.error ?? ""))
+        ContentUnavailableView("Search Failed", systemImage: "wifi.exclamationmark", description: Text(s.error ?? ""))
       } else if searched, s.status == .loaded, s.results.isEmpty {
         ContentUnavailableView.search(text: s.query)
       } else if !searched {
-        ContentUnavailableView("都市を検索", systemImage: "magnifyingglass", description: Text("都市名で検索して、天気を見られます"))
+        ContentUnavailableView("Search for a City", systemImage: "magnifyingglass", description: Text("Search by city name to see its weather."))
       }
     }
-    .navigationTitle("検索")
-    .searchable(text: $query, prompt: "都市名（例：Tokyo）")
+    .navigationTitle("Search")
+    .searchable(text: $query, prompt: "City name (e.g. Tokyo)")
     .onChange(of: query) { vm.tap(.changeQuery(query: query)) }
     .onSubmit(of: .search) { vm.tap(.submit) }
   }
@@ -84,15 +84,15 @@ struct CityScreen: View {
         Text(city.region).font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.75))
         ForecastCard(forecast: forecast)
       case .error(let message):
-        MessageCard(icon: "exclamationmark.icloud.fill", title: "天気を取得できませんでした", message: message) {
-          Button("再試行") { vm.tap(.retry) }.buttonStyle(.glassProminent)
+        MessageCard(icon: "exclamationmark.icloud.fill", title: "Couldn't Load the Weather", message: message) {
+          Button("Try Again") { vm.tap(.retry) }.buttonStyle(.glassProminent)
         }
       }
     }
     .navigationTitle(loaded?.city.name ?? "")
     .toolbar {
       if let loaded {
-        Button("お気に入り", systemImage: loaded.favorite ? "star.fill" : "star") { vm.tap(.toggleFavorite) }
+        Button("Favorite", systemImage: loaded.favorite ? "star.fill" : "star") { vm.tap(.toggleFavorite) }
           .tint(loaded.favorite ? .yellow : nil)
       }
     }
@@ -113,10 +113,10 @@ struct FavoritesScreen: View {
     }
     .overlay {
       if vm.state.status == .loaded, vm.state.items.isEmpty {
-        ContentUnavailableView("お気に入りはまだありません", systemImage: "star",
-                               description: Text("都市の詳細で ☆ を押すと、ここに並びます"))
+        ContentUnavailableView("No Favorites Yet", systemImage: "star",
+                               description: Text("Tap ☆ on a city to add it here."))
       }
     }
-    .navigationTitle("お気に入り")
+    .navigationTitle("Favorites")
   }
 }

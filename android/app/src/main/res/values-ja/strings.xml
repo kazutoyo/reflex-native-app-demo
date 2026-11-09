@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">天気</string>
+  <string name="tab_weather">天気</string>
+  <string name="tab_search">検索</string>
+  <string name="tab_favorites">お気に入り</string>
+  <string name="back">戻る</string>
+  <string name="my_location">現在地</string>
+  <string name="high_low">最高 %1$d° 最低 %2$d°</string>
+  <string name="forecast_7_day">7日間の予報</string>
+  <string name="today">今日</string>
+  <string name="couldnt_load">取得できませんでした</string>
+  <string name="location_off_title">位置情報が許可されていません</string>
+  <string name="location_off_message">現在地の天気を表示するには、位置情報の利用を許可してください。</string>
+  <string name="allow_again">もう一度許可する</string>
+  <string name="open_settings">設定を開く</string>
+  <string name="search_for_city">都市を検索する</string>
+  <string name="weather_failed">天気を取得できませんでした</string>
+  <string name="try_again">再試行</string>
+  <string name="search_placeholder">都市名（例：Tokyo）</string>
+  <string name="search_failed">検索できませんでした：%1$s</string>
+  <string name="no_results">見つかりませんでした</string>
+  <string name="search_hint">都市名で検索して、天気を見られます</string>
+  <string name="favorite">お気に入り</string>
+  <string name="no_favorites">お気に入りはまだありません。都市の詳細で ☆ を押すと、ここに並びます</string>
+  <string name="weather_clear">快晴</string>
+  <string name="weather_sunny">晴れ</string>
+  <string name="weather_cloudy">くもり</string>
+  <string name="weather_fog">霧</string>
+  <string name="weather_drizzle">霧雨</string>
+  <string name="weather_rain">雨</string>
+  <string name="weather_snow">雪</string>
+  <string name="weather_showers">にわか雨</string>
+  <string name="weather_snow_showers">にわか雪</string>
+  <string name="weather_thunderstorm">雷雨</string>
+</resources>

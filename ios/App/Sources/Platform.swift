@@ -7,12 +7,12 @@ import WeatherCore
 
 @MainActor final class URLSessionHTTP: HTTPClient {
   func get(_ url: String) async throws -> HTTPResponse {
-    guard let u = URL(string: url) else { throw CoreError("URL が正しくない: \(url)") }
+    guard let u = URL(string: url) else { throw CoreError("Invalid URL: \(url)") }
     do {
       let (data, res) = try await URLSession.shared.data(from: u)
       return HTTPResponse(status: (res as? HTTPURLResponse)?.statusCode ?? 0, body: data)
     } catch {
-      throw CoreError("ネットワークに接続できません")
+      throw CoreError("Cannot connect to the network")
     }
   }
 }
@@ -60,7 +60,7 @@ import WeatherCore
   }
 
   func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-    positionWaiters.forEach { $0.resume(throwing: CoreError("位置を取得できない")) }
+    positionWaiters.forEach { $0.resume(throwing: CoreError("Cannot get the location")) }
     positionWaiters = []
   }
 

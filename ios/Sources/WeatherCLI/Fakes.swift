@@ -14,7 +14,7 @@ import WeatherCore
   func get(_ url: String) async throws -> HTTPResponse {
     requests += 1
     switch mode {
-    case .offline: throw CoreError("ネットワークに接続できません")
+    case .offline: throw CoreError("Cannot connect to the network")
     case .status(let status): return HTTPResponse(status: status, body: Data("{}".utf8))
     case .fixtures: return HTTPResponse(status: 200, body: try fixture(url))
     }
@@ -49,7 +49,7 @@ import WeatherCore
       }
     default: break
     }
-    throw CoreError("フィクスチャがない: \(url)")
+    throw CoreError("No fixture for \(url)")
   }
 }
 

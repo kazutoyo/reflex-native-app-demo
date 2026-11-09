@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 
 import { launch } from './sdk';
 
-test('許可されていれば、起動するだけで現在地の天気が出る', async () => {
+test('with permission, launching shows the weather for the current location', async () => {
   const app = await launch();
   const { path, name, state } = await app.ls();
   expect({ path, name }).toEqual({ path: '/', name: 'Weather' });
@@ -14,7 +14,7 @@ test('許可されていれば、起動するだけで現在地の天気が出�
   expect(state.forecast.daily).toHaveLength(7);
 });
 
-test('拒否されたら、もう一度許可を求められる', async () => {
+test('after a denial, the app can ask for permission again', async () => {
   const app = await launch({ location: { granted: false, canAskAgain: true } });
   expect((await app.ls()).state).toEqual({ status: 'permissionDenied', canAskAgain: true });
 
@@ -22,23 +22,23 @@ test('拒否されたら、もう一度許可を求められる', async () => {
   expect((await app.do('Retry')).state.status).toBe('loaded');
 });
 
-test('二度と聞けないときは設定アプリを開く', async () => {
+test('when the app cannot ask again, it opens Settings', async () => {
   const app = await launch({ location: { granted: false, canAskAgain: false } });
   expect((await app.ls()).state).toEqual({ status: 'permissionDenied', canAskAgain: false });
   expect((await app.do('OpenSettings')).env.settingsOpened).toBe(1);
 });
 
-test('拒否されたら都市検索へ逃がす', async () => {
+test('after a denial, the user can go to city search instead', async () => {
   const app = await launch({ location: { granted: false, canAskAgain: false } });
   expect(await app.do('OpenSearch')).toMatchObject({ path: '/search', name: 'Search' });
 });
 
-test('位置が取れないときはエラー', async () => {
-  const app = await launch({ location: { positionError: '位置を取得できない' } });
-  expect((await app.ls()).state).toEqual({ status: 'error', message: '位置を取得できない' });
+test('an error when the location is unavailable', async () => {
+  const app = await launch({ location: { positionError: 'Cannot get the location' } });
+  expect((await app.ls()).state).toEqual({ status: 'error', message: 'Cannot get the location' });
 });
 
-test('API が 500 ならエラー、直れば再試行で読める', async () => {
+test('an API 500 shows an error, and retry loads once it recovers', async () => {
   const app = await launch({ http: { status: 500 } });
   expect((await app.ls()).state).toEqual({ status: 'error', message: 'HTTP 500' });
 
@@ -46,7 +46,7 @@ test('API が 500 ならエラー、直れば再試行で読める', async () =>
   expect((await app.do('Retry')).state.status).toBe('loaded');
 });
 
-test('設定で許可してから天気タブに戻ると、読み直す', async () => {
+test('granting permission in Settings and returning to the weather tab reloads', async () => {
   const app = await launch({ location: { granted: false, canAskAgain: false } });
   await app.do('OpenSettings');
   await app.do('OpenSearch'); // Leave the weather tab so that coming back sends Appear
@@ -58,14 +58,14 @@ test('設定で許可してから天気タブに戻ると、読み直す', async
   });
 });
 
-test('読み込めたあとはタブを行き来しても取り直さない', async () => {
+test('once loaded, switching tabs does not refetch', async () => {
   const app = await launch();
   await app.do('OpenSearch');
   const { env } = await app.do('SelectTab', { tab: 'weather' });
   expect(env.httpRequests).toBe(1);
 });
 
-test('地名が取れなくても天気は出す', async () => {
-  const app = await launch({ location: { placeError: '逆ジオコーディング失敗' } });
+test('the weather still shows when the place name is unavailable', async () => {
+  const app = await launch({ location: { placeError: 'Reverse geocoding failed' } });
   expect((await app.ls()).state).toMatchObject({ status: 'loaded', place: null });
 });

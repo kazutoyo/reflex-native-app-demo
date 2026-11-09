@@ -30,7 +30,7 @@ while (args.length) {
   else if (a === 'env') cmds.push({ cmd: 'env', ...json(args[0]) });
   else if (a === 'open') cmds.push({ cmd: 'open', route: args.shift() });
   else {
-    console.error(`不明な引数: ${a}`);
+    console.error(`Unknown argument: ${a}`);
     process.exit(2);
   }
 }

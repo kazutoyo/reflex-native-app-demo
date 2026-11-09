@@ -116,13 +116,13 @@ import Observation
     case "SelectTab":
       struct Input: Decodable { let tab: AppTab }
       guard let input = try? JSONDecoder().decode(Input.self, from: input) else {
-        throw CoreError("SelectTab の入力が正しくない: \(String(data: input, encoding: .utf8) ?? "")")
+        throw CoreError("Invalid input for SelectTab: \(String(data: input, encoding: .utf8) ?? "")")
       }
       selectTab(input.tab)
     case _ where focused.actions.contains(action):
       try await focused.perform(action, input: input)
     default:
-      throw CoreError("\(focused.name) に \(action) はない: \(actions.joined(separator: ", "))")
+      throw CoreError("\(focused.name) has no action \(action). Actions: \(actions.joined(separator: ", "))")
     }
     await idle()
   }

@@ -72,7 +72,7 @@ export class Session {
       proc.stdin.write(line);
       proc.stdin.flush();
     };
-    return new Session(write, readLines(proc.stdout), () => proc.kill(), `${platform} の CLI`);
+    return new Session(write, readLines(proc.stdout), () => proc.kill(), `the ${platform} CLI`);
   }
 
   private static async spawnRN() {
@@ -92,7 +92,7 @@ export class Session {
       }
     }
     proc.kill();
-    throw new Error(`RN のハーネスにつながらない（${RN_APP}）`);
+    throw new Error(`Cannot connect to the RN harness (${RN_APP})`);
   }
 
   /** Connects to the in-app server of a development build (iOS Simulator via localhost, Android via adb forward) */
@@ -111,10 +111,10 @@ export class Session {
   async request(body: object): Promise<any> {
     this.write(JSON.stringify(body) + '\n');
     const { value, done } = await this.lines.next();
-    if (done) throw new Error(`${this.label} が終了した`);
+    if (done) throw new Error(`${this.label} exited`);
     const res = JSON.parse(value);
     if (!res.ok) throw new Error(res.error);
-    if (res.env?.networkViolations) throw new Error(`ネットワークに出ようとした（${res.env.networkViolations} 回）`);
+    if (res.env?.networkViolations) throw new Error(`Tried to reach the network (${res.env.networkViolations} times)`);
     return res;
   }
 }

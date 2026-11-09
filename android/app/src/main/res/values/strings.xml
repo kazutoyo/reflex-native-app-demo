@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Weather</string>
+  <string name="tab_weather">Weather</string>
+  <string name="tab_search">Search</string>
+  <string name="tab_favorites">Favorites</string>
+  <string name="back">Back</string>
+  <string name="my_location">My Location</string>
+  <string name="high_low">H:%1$d° L:%2$d°</string>
+  <string name="forecast_7_day">7-Day Forecast</string>
+  <string name="today">Today</string>
+  <string name="couldnt_load">Couldn\'t load</string>
+  <string name="location_off_title">Location Access Is Off</string>
+  <string name="location_off_message">Allow location access to see the weather where you are.</string>
+  <string name="allow_again">Allow Again</string>
+  <string name="open_settings">Open Settings</string>
+  <string name="search_for_city">Search for a City</string>
+  <string name="weather_failed">Couldn\'t Load the Weather</string>
+  <string name="try_again">Try Again</string>
+  <string name="search_placeholder">City name (e.g. Tokyo)</string>
+  <string name="search_failed">Search failed: %1$s</string>
+  <string name="no_results">No results</string>
+  <string name="search_hint">Search by city name to see its weather.</string>
+  <string name="favorite">Favorite</string>
+  <string name="no_favorites">No favorites yet. Tap ☆ on a city to add it here.</string>
+  <string name="weather_clear">Clear</string>
+  <string name="weather_sunny">Sunny</string>
+  <string name="weather_cloudy">Cloudy</string>
+  <string name="weather_fog">Fog</string>
+  <string name="weather_drizzle">Drizzle</string>
+  <string name="weather_rain">Rain</string>
+  <string name="weather_snow">Snow</string>
+  <string name="weather_showers">Showers</string>
+  <string name="weather_snow_showers">Snow Showers</string>
+  <string name="weather_thunderstorm">Thunderstorm</string>
+</resources>

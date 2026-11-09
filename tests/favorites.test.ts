@@ -2,24 +2,24 @@ import { expect, test } from 'bun:test';
 
 import { launch, TOKYO } from './sdk';
 
-test('お気に入りがなければ空', async () => {
+test('favorites is empty when nothing is saved', async () => {
   const app = await launch({ route: '/favorites' });
   expect(await app.ls()).toMatchObject({ name: 'Favorites', state: { status: 'loaded', items: [] } });
 });
 
-test('お気に入りの都市と今の天気が並ぶ', async () => {
+test('favorites lists each city with its current weather', async () => {
   const app = await launch({ route: '/favorites', favorites: [TOKYO.id] });
   expect((await app.ls()).state.items).toEqual([
     { city: TOKYO, current: { temperature: 23.5, code: 0 }, failed: false },
   ]);
 });
 
-test('天気が取れない都市も一覧には残る', async () => {
+test('a city whose weather fails to load stays in the list', async () => {
   const app = await launch({ route: '/favorites', favorites: [TOKYO.id], http: { status: 503 } });
   expect((await app.ls()).state.items).toEqual([{ city: TOKYO, current: null, failed: true }]);
 });
 
-test('開いてお気に入りを外し、戻ると一覧から消える', async () => {
+test('unfavoriting a city and going back removes it from the list', async () => {
   const app = await launch({ route: '/favorites', favorites: [TOKYO.id] });
 
   expect(await app.do('Open', { id: TOKYO.id })).toMatchObject({
@@ -34,18 +34,18 @@ test('開いてお気に入りを外し、戻ると一覧から消える', async
   expect(back.env.favorites).toEqual([]);
 });
 
-test('天気タブ → お気に入りタブ（タブのタップ）', async () => {
+test('weather tab → favorites tab (tapping the tab)', async () => {
   const app = await launch({ favorites: [TOKYO.id] });
   expect((await app.do('SelectTab', { tab: 'favorites' })).state.items).toHaveLength(1);
 });
 
-test('知らないアクションは送れず、送れるアクションを返す', async () => {
+test('an unknown action is rejected with the list of available actions', async () => {
   const app = await launch();
-  await expect(app.do('ToggleFavorite')).rejects.toThrow('Weather に ToggleFavorite はない: Appear, Retry, OpenSettings, OpenSearch, SelectTab');
+  await expect(app.do('ToggleFavorite')).rejects.toThrow('Weather has no action ToggleFavorite. Actions: Appear, Retry, OpenSettings, OpenSearch, SelectTab');
 });
 
-test('入力の形が違うアクションは、画面に届く前に断る', async () => {
+test('an action with the wrong input shape is rejected before it reaches the screen', async () => {
   const app = await launch({ route: '/search' });
-  await expect(app.do('Open', { id: 'tokyo' })).rejects.toThrow('Open の入力が正しくない');
-  await expect(app.do('Open', { id: '1850147' })).rejects.toThrow('Open の入力が正しくない');
+  await expect(app.do('Open', { id: 'tokyo' })).rejects.toThrow('Invalid input for Open');
+  await expect(app.do('Open', { id: '1850147' })).rejects.toThrow('Invalid input for Open');
 });

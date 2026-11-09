@@ -41,7 +41,7 @@ class FixtureHttp : HttpClient {
   override suspend fun get(url: String): HttpResponse {
     requests++
     return when (val mode = mode) {
-      Mode.Offline -> throw CoreError("ネットワークに接続できません")
+      Mode.Offline -> throw CoreError("Cannot connect to the network")
       is Mode.Status -> HttpResponse(mode.status, "{}")
       Mode.Fixtures -> HttpResponse(200, fixture(url))
     }
@@ -76,7 +76,7 @@ class FixtureHttp : HttpClient {
         results.firstOrNull { it.jsonObject["id"]!!.jsonPrimitive.content == query["id"] }?.let { return it.toString() }
       }
     }
-    throw CoreError("フィクスチャがない: $url")
+    throw CoreError("No fixture for $url")
   }
 }
 
@@ -119,7 +119,7 @@ object BlockNetwork : ProxySelector() {
   var attempts = 0
   override fun select(uri: URI?): List<Proxy> {
     attempts++
-    throw IOException("テスト中のネットワークは禁止: $uri")
+    throw IOException("Network access is not allowed in tests: $uri")
   }
   override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {}
 }

@@ -29,7 +29,7 @@ class DebugHttp(private val base: HttpClient) : HttpClient {
   var weatherCode: Int? = null
 
   override suspend fun get(url: String): HttpResponse {
-    if (offline) throw CoreError("ネットワークに接続できません")
+    if (offline) throw CoreError("Cannot connect to the network")
     val res = base.get(url)
     val code = weatherCode ?: return res
     if (URI(url).path != "/v1/forecast" || res.status >= 400) return res
@@ -79,7 +79,7 @@ class InspectorServer(private val root: AppRoot, private val http: DebugHttp, pr
     when (req["cmd"]?.jsonPrimitive?.contentOrNull) {
       "ls" -> {}
       "do" -> root.perform(
-        req["action"]?.jsonPrimitive?.contentOrNull ?: throw CoreError("action がない"),
+        req["action"]?.jsonPrimitive?.contentOrNull ?: throw CoreError("Missing action"),
         req["input"]?.jsonObject ?: JsonObject(emptyMap()),
       )
       "open" -> {
@@ -91,11 +91,11 @@ class InspectorServer(private val root: AppRoot, private val http: DebugHttp, pr
           "offline" -> http.offline = true
           "live" -> http.offline = false
           null -> {}
-          else -> throw CoreError("http は offline か live: $h")
+          else -> throw CoreError("http must be offline or live: $h")
         }
         if ("weatherCode" in req) http.weatherCode = req["weatherCode"]?.jsonPrimitive?.intOrNull
       }
-      else -> throw CoreError("知らないコマンド: ${req["cmd"]}（アプリでは ls / do / open / env だけ）")
+      else -> throw CoreError("Unknown command: ${req["cmd"]}. The app supports only ls, do, open, and env")
     }
     JsonObject(mapOf("ok" to JsonPrimitive(true)) + root.snapshot())
   } catch (e: Exception) {

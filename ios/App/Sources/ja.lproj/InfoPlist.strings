@@ -1,0 +1,3 @@
+"CFBundleDisplayName" = "天気";
+"NSLocationWhenInUseUsageDescription" = "現在地の天気を表示するために使います";
+"NSLocalNetworkUsageDescription" = "開発中に CLI からアプリを操作するために使います";
