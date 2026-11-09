@@ -3,6 +3,7 @@ import Foundation
 /// Open-Meteo (no API key needed). Networking is delegated to the injected HTTPClient.
 @MainActor public struct OpenMeteo {
   let http: HTTPClient
+  let language: String // Language for city names (Geocoding API)
 
   private func get<T: Decodable>(_ url: String, as: T.Type) async throws -> T {
     let res = try await http.get(url)
@@ -54,11 +55,11 @@ import Foundation
   public func searchCities(_ query: String) async throws -> [City] {
     let name = query.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? query
     let r = try await get(
-      "https://geocoding-api.open-meteo.com/v1/search?name=\(name)&count=10&language=ja", as: SearchResponse.self)
+      "https://geocoding-api.open-meteo.com/v1/search?name=\(name)&count=10&language=\(language)", as: SearchResponse.self)
     return (r.results ?? []).map(\.city)
   }
 
   public func city(_ id: Int) async throws -> City {
-    try await get("https://geocoding-api.open-meteo.com/v1/get?id=\(id)&language=ja", as: Place.self).city
+    try await get("https://geocoding-api.open-meteo.com/v1/get?id=\(id)&language=\(language)", as: Place.self).city
   }
 }

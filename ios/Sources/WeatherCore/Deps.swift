@@ -57,8 +57,8 @@ public enum Route: Sendable {
   public let api: OpenMeteo
   public let location: LocationService
   public let favorites: FavoritesStore
-  public init(http: HTTPClient, location: LocationService, favorites: FavoritesStore) {
-    api = OpenMeteo(http: http)
+  public init(http: HTTPClient, location: LocationService, favorites: FavoritesStore, language: String = "ja") {
+    api = OpenMeteo(http: http, language: language)
     self.location = location
     self.favorites = favorites
   }

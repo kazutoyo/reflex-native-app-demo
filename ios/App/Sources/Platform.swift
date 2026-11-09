@@ -66,7 +66,7 @@ import WeatherCore
 
   func placeName(_ coords: Coords) async throws -> String? {
     let placemarks = try await CLGeocoder().reverseGeocodeLocation(
-      CLLocation(latitude: coords.latitude, longitude: coords.longitude), preferredLocale: Locale(identifier: "ja_JP"))
+      CLLocation(latitude: coords.latitude, longitude: coords.longitude), preferredLocale: Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en"))
     let p = placemarks.first
     return p?.locality ?? p?.subAdministrativeArea ?? p?.administrativeArea
   }

@@ -45,6 +45,6 @@ interface Navigator {
 }
 
 /** Dependencies injected via the constructor. No DI framework. */
-class Deps(http: HttpClient, val location: LocationService, val favorites: FavoritesStore) {
-  val api = OpenMeteo(http)
+class Deps(http: HttpClient, val location: LocationService, val favorites: FavoritesStore, language: String = "ja") {
+  val api = OpenMeteo(http, language)
 }

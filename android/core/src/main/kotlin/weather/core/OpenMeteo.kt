@@ -10,8 +10,11 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-/** Open-Meteo (no API key needed). Networking is delegated to the injected HttpClient. */
-class OpenMeteo(private val http: HttpClient) {
+/**
+ * Open-Meteo (no API key needed). Networking is delegated to the injected HttpClient.
+ * [language] is the language for city names (Geocoding API).
+ */
+class OpenMeteo(private val http: HttpClient, private val language: String = "ja") {
   private suspend fun get(url: String): JsonObject {
     val res = http.get(url)
     if (res.status !in 200..299) throw CoreError("HTTP ${res.status}")
@@ -51,10 +54,10 @@ class OpenMeteo(private val http: HttpClient) {
 
   suspend fun searchCities(query: String): List<City> {
     val name = URLEncoder.encode(query, Charsets.UTF_8)
-    val r = get("https://geocoding-api.open-meteo.com/v1/search?name=$name&count=10&language=ja")
+    val r = get("https://geocoding-api.open-meteo.com/v1/search?name=$name&count=10&language=$language")
     // results is absent when there are no matches
     return r["results"]?.jsonArray?.map { city(it.jsonObject) } ?: emptyList()
   }
 
-  suspend fun city(id: Int): City = city(get("https://geocoding-api.open-meteo.com/v1/get?id=$id&language=ja"))
+  suspend fun city(id: Int): City = city(get("https://geocoding-api.open-meteo.com/v1/get?id=$id&language=$language"))
 }

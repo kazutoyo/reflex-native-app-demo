@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
     val debuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     val http = if (debuggable) DebugHttp(UrlConnectionHttp()) else UrlConnectionHttp()
-    root = AppRoot(Deps(http, location, PreferencesFavorites(this)), lifecycleScope)
+    root = AppRoot(Deps(http, location, PreferencesFavorites(this), resources.configuration.locales[0].language), lifecycleScope)
     root.open(intent.data?.let { "/" + (it.host ?: "") + (it.path ?: "") } ?: "/")
     if (http is DebugHttp) InspectorServer(root, http, lifecycleScope).start()
     setContent { RootView(root) }

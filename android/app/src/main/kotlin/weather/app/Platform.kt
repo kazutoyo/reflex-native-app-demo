@@ -12,7 +12,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.Locale
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -78,7 +77,7 @@ class DeviceLocation(private val activity: ComponentActivity) : LocationService 
   }
 
   override suspend fun placeName(coords: Coords): String? = suspendCancellableCoroutine { cont ->
-    Geocoder(activity, Locale.JAPAN).getFromLocation(coords.latitude, coords.longitude, 1, object : Geocoder.GeocodeListener {
+    Geocoder(activity, activity.resources.configuration.locales[0]).getFromLocation(coords.latitude, coords.longitude, 1, object : Geocoder.GeocodeListener {
       override fun onGeocode(addresses: MutableList<android.location.Address>) {
         val a = addresses.firstOrNull()
         cont.resume(a?.locality ?: a?.subAdminArea ?: a?.adminArea)

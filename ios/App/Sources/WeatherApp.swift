@@ -9,7 +9,8 @@ struct WeatherApp: App {
     private static let http: HTTPClient = URLSessionHTTP()
   #endif
   @State private var root = AppRoot(
-    deps: Deps(http: http, location: DeviceLocation(), favorites: DefaultsFavorites()))
+    deps: Deps(http: http, location: DeviceLocation(), favorites: DefaultsFavorites(),
+      language: Bundle.main.preferredLocalizations.first ?? "en")) // Same language as the UI
 
   var body: some Scene {
     WindowGroup {
