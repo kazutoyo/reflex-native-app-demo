@@ -25,6 +25,7 @@ import WeatherCore
   override init() {
     super.init()
     manager.delegate = self
+    manager.desiredAccuracy = kCLLocationAccuracyHundredMeters // a city's weather; Expo's Balanced
   }
 
   private var permission: Permission {

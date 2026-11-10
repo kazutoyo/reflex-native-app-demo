@@ -66,9 +66,11 @@ import Observation
     guard permission.granted else { return dispatch(.denied(canAskAgain: permission.canAskAgain)) }
     do {
       let coords = try await deps.location.currentPosition()
+      // The forecast and the place name in parallel, as the Expo version does.
+      let location = deps.location
+      let place = Task { try? await location.placeName(coords) } // Show the weather even if the place name is unavailable
       let forecast = try await deps.api.forecast(latitude: coords.latitude, longitude: coords.longitude)
-      let place = try? await deps.location.placeName(coords) // Show the weather even if the place name is unavailable
-      dispatch(.loaded(forecast, place: place ?? nil))
+      dispatch(.loaded(forecast, place: await place.value ?? nil))
     } catch {
       dispatch(.failed(errorMessage(error)))
     }
